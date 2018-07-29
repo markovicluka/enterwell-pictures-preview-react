@@ -76,11 +76,11 @@ export class ModalPicture extends Component {
         <div className={modal}>
           <div className={modalPictureGrid}>
             <img src={state.information.urls.raw} alt='image' className={imgModal}/>
-            <div className={modalText}>created at: {state.information.created_at || noInformation}</div>
-            <div className={modalText}>description: {state.information.description || noInformation}</div>
-            <div className={modalText}>downloads: {state.statistics.downloads ? state.statistics.downloads.total:''}</div>
-            <div className={modalText}>views: {state.statistics.views ? state.statistics.views.total:noInformation}</div>
-            <div className={modalText}>likes: {state.statistics.likes ? state.statistics.likes.total:noInformation}</div>
+            <div className={modalText}>Created at: {state.information.created_at.split('T')[0] || noInformation}</div>
+            <div className={modalText}>Description: {state.information.description || noInformation}</div>
+            <div className={modalText}>Downloads: {state.statistics.downloads ? state.statistics.downloads.total:''}</div>
+            <div className={modalText}>Views: {state.statistics.views ? state.statistics.views.total:noInformation}</div>
+            <div className={modalText}>Likes: {state.statistics.likes ? state.statistics.likes.total:noInformation}</div>
             <div className={cx(modalText, pointer)} onClick={ onAuthorClick }>Author: {state.information.user.name || noInformation}</div>
           </div>
           <div className={buttonClose} onClick={onClose}>✖</div>
