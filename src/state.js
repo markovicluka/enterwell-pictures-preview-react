@@ -20,6 +20,10 @@ class State {
 
   @observable
   authorsPictures = []; // pictures of author rendered in AuthorModal (Prikaz C)
+
+  @observable
+  pageNumber = 1;
+
 }
 
 export default new State();

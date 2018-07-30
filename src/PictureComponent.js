@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import {css} from 'emotion';
-import { action } from 'mobx';
-import state from './state'
+import { css } from 'emotion';
 
 const box = css`
     display: grid;
@@ -40,8 +38,8 @@ export class PictureComponent extends Component {
   render() {
     const { children, onPictureClick, onAuthorClick, picture } = this.props;
     return (
-      <div className={box}>
-          {children}
+      <div className={ box }>
+          { children }
           <img className={ img } src={ picture.urls.thumb } onClick={ onPictureClick }/>
           <div className={ description }>{ picture.description }</div>
           <div className={ author } onClick={ this._openModalAuthor } onClick={ onAuthorClick }>{ picture.user.name }</div>

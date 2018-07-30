@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { css, cx } from 'emotion';
-import { action } from 'mobx';
-import state from './state';
+import { css } from 'emotion';
 
  const modal = css`
     background-color: white;
@@ -60,11 +58,6 @@ import state from './state';
     align-self: center;
   `;
 
-  const pointer = css`
-    cursor: pointer;
-  `;
-
-
   const authorsPictures = css`
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -75,28 +68,26 @@ import state from './state';
   `;
 
 
- @observer
+@observer
 export class ModalAuthor extends Component {
 
   render() {
-    const { children, onClose } = this.props;
+    const { children, onClose, state } = this.props;
     const noInformation = 'No information available';
      return (
-      <div className={overlay}>
-          <div className={modal}>
-            <div className={modalAuthorGrid}>
-              <img src={state.information.user.profile_image.large} alt='profile image' className={imgModal}/>
-              <div className={modalText}>Name: {state.information.user.name || noInformation}</div>
-              <div className={modalText}>Bio: {state.information.user.bio || noInformation}</div>
-              <div className={authorsPictures}>
-                {children}
-              </div>
-              <div className={modalText}>Location: {state.information.user.location || noInformation}</div>
-              <div className={modalText}>Instagram username: {state.information.user.instagram_username || noInformation}</div>
-              <a href={state.information.user.portfolio_url} className={modalText}>Portfolio</a>
+      <div className={ overlay }>
+          <div className={ modal }>
+            <div className={ modalAuthorGrid }>
+              <img src={ state.information.user.profile_image.large } className={imgModal}/>
+              <div className={ modalText }>Name: { state.information.user.name || noInformation }</div>
+              <div className={ modalText }>Bio: { state.information.user.bio || noInformation }</div>
+              <div className={ authorsPictures }>{ children }</div>
+              <div className={ modalText }>Location: { state.information.user.location || noInformation }</div>
+              <div className={modalText}>Instagram username: { state.information.user.instagram_username || noInformation }</div>
+              <a href={ state.information.user.portfolio_url } className={ modalText }>Portfolio</a>
 
             </div>
-            <div className={button} onClick={onClose}>✖</div>
+            <div className={ button } onClick={ onClose }>✖</div>
           </div>
       </div>
     );

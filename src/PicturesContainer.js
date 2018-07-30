@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { PictureComponent } from './PictureComponent';
-import { css, cx } from 'emotion';
+import { css } from 'emotion';
 import state from './state';
 import { observer } from 'mobx-react';
-import { action, computed } from 'mobx';
+import { action } from 'mobx';
 import { ModalPicture } from './ModalPicture';
 import { ModalAuthor } from './ModalAuthor';
 import { getAllUsersPhotos, getAllPicturesCurated, getPictureStatistics } from './services/api'
+import { NavigationComponent } from './NavigationComponent'
 
 const parentDiv = css`
   position: relative;
@@ -23,26 +24,34 @@ const authorsPicture = css`
   cursor: pointer;
 `;
 
+const navigation = css`
+  position: absolute;
+  top: 550px;
+  width: 100%;
+  margin-top: 50px;
+`;
 
 @observer
 class PicturesContainer extends Component {
 
   // Stores author information by storing picture object to state.information
-  //and allows for author modal to show (Prikaz C)
+  //and allows for author modal to show
   @action.bound
   _openModalAuthor(picture){
       state.isModalPictureOpen = false;
       state.isModalAuthorOpen = true;
       state.information = picture;
+      this.fetchAutorsPictures();
   }
 
   // Stores information of clicked picture to state.information
-  // and allows for picture modal to show (Prikaz B)
+  // and allows for picture modal to show
   @action.bound
   _openModalPicture(picture){
       state.isModalAuthorOpen = false;
       state.isModalPictureOpen = true;
       state.information = picture;
+      this.fetchPictureStatistics();
   }
 
   // Called when closing any modal
@@ -56,10 +65,16 @@ class PicturesContainer extends Component {
     state.authorsPictures = [];
   }
 
-  // Fetching all curated pictures and storing them in state.pictures
+
   componentDidMount(){
-    getAllPicturesCurated()
-      .then((result) => state.pictures.replace(result))
+    this.fetchPicturesCurated(state.pageNumber);
+  }
+
+  // Fetching all curated pictures and storing them in state.pictures
+  @action.bound
+  fetchPicturesCurated(page) {
+    getAllPicturesCurated(page)
+      .then((result) => state.pictures.replace(result));
   }
 
   // Called when state.isModalAuthorOpen is true
@@ -78,38 +93,54 @@ class PicturesContainer extends Component {
           .then((result) => state.statistics = result);
   }
 
+  // Pagination. Pages start from 1, so if it is 1 if-condition is true and backButton would cause page go to 0
+  // After updating state.pageNumber, new fetch is called with new parameter
+  @action.bound
+  _onNavigationButtonClick(backOrNext) {
+    return action((event) => {
+      if(state.pageNumber >= 1 ){
+        backOrNext === 'back' ? state.pageNumber-- : state.pageNumber++;
+        state.pageNumber === 0 && (state.pageNumber = 1);
+        this.fetchPicturesCurated(state.pageNumber);
+      }
+    });
+  }
+
   render() {
-    if(state.isModalAuthorOpen){
-        this.fetchAutorsPictures();
-    }else if(state.isModalPictureOpen){
-        this.fetchPictureStatistics();
-    }
 
-
+    //console.log("render");
     return (
-      <div className={parentDiv}>
-            {state.pictures.map((picture) =>
+      <div className={ parentDiv }>
+            { state.pictures.map((picture) =>
                 <PictureComponent
-                    onPictureClick={() => this._openModalPicture(picture)} // passing function for handling click on picture in component
-                    onAuthorClick={() => this._openModalAuthor(picture)} // passing function for handling click on author in component
-                    picture={picture} // passing information of picture to a component
+                    onPictureClick={ () => this._openModalPicture(picture) } // passing function for handling click on picture in component
+                    onAuthorClick={ () => this._openModalAuthor(picture) } // passing function for handling click on author in component
+                    picture={ picture } // passing information of picture to a component
                 />
-            )}
+              )
+             }
             {
               state.isModalPictureOpen &&
-              <ModalPicture onAuthorClick={() => this._openModalAuthor(state.information)} onClose={() => this._onClose()}/>
+              <ModalPicture
+                  onAuthorClick={ () => this._openModalAuthor(state.information) }
+                  onClose={ () => this._onClose() }
+              />
             }
             {
               state.isModalAuthorOpen &&
-              <ModalAuthor onClose={() => this._onClose()}>{ // passing all authors pictures in props.children
-                    state.authorsPictures.map((picture) =>
+              <ModalAuthor onClose={ () => this._onClose() } state={ state }>{
+                    state.authorsPictures.map((picture) =>                       // passing all authors pictures in props.children
                       <img src={picture.urls.thumb}
                           onClick={ () => this._openModalPicture(picture) }
                           className={ authorsPicture }
-                       />)
-                     }
+                       />
+                     )
+              }
               </ModalAuthor>
             }
+            <div className={ navigation }>
+              <NavigationComponent onBackClick={ this._onNavigationButtonClick('back') } onNextClick={ this._onNavigationButtonClick('next') } pageNumber={ state.pageNumber }/>
+            </div>
       </div>
     );
   }
